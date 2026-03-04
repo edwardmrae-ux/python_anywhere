@@ -7,7 +7,7 @@ import time
 
 print("--------Starting---------")
 
-for x in range(0,1):
+for x in range(0,360):
     print("Starting loop: " + str(x))
 
     SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
@@ -28,6 +28,9 @@ for x in range(0,1):
 
     now = datetime.now()
     now_EDT = now - timedelta(hours=4)
+    current_day = datetime.today().day
+    current_month = datetime.today().month
+    current_year = datetime.today().year
 
     #returning games already in table and finished games
 
@@ -52,7 +55,8 @@ for x in range(0,1):
 
 
     #Games API call
-    url = "https://basketapi1.p.rapidapi.com/api/basketball/matches/21/3/2024"
+    #url = "https://basketapi1.p.rapidapi.com/api/basketball/matches/18/3/2025"
+    url = f"https://basketapi1.p.rapidapi.com/api/basketball/matches/{current_day}/{current_month}/{current_year}"
 
     headers = {
     	"X-RapidAPI-Key": "b88fd41b6amsh5775253c68a3727p1f2f1djsn80959b53b4a8",
@@ -60,10 +64,6 @@ for x in range(0,1):
     }
 
     response = requests.request("GET", url, headers=headers)
-
-    print(response.text)
-
-    '''
 
     json_response = response.json()
 
@@ -118,17 +118,17 @@ for x in range(0,1):
             game_date = game_time_date - timedelta(hours=4)
 
             game_round = 0
-            if(game_date > datetime.strptime('2024-03-21', "%Y-%m-%d") and game_date < datetime.strptime('2024-03-23', "%Y-%m-%d")):
+            if(game_date > datetime.strptime('2025-03-20', "%Y-%m-%d") and game_date < datetime.strptime('2025-03-22', "%Y-%m-%d")):
                 game_round = 1
-            elif(game_date > datetime.strptime('2024-03-23', "%Y-%m-%d") and game_date < datetime.strptime('2024-03-25', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2025-03-22', "%Y-%m-%d") and game_date < datetime.strptime('2025-03-24', "%Y-%m-%d")):
                 game_round = 2
-            elif(game_date > datetime.strptime('2024-03-28', "%Y-%m-%d") and game_date < datetime.strptime('2024-03-30', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2025-03-27', "%Y-%m-%d") and game_date < datetime.strptime('2025-03-29', "%Y-%m-%d")):
                 game_round = 3
-            elif(game_date > datetime.strptime('2024-03-30', "%Y-%m-%d") and game_date < datetime.strptime('2024-04-01', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2025-03-29', "%Y-%m-%d") and game_date < datetime.strptime('2025-03-31', "%Y-%m-%d")):
                 game_round = 4
-            elif(game_date > datetime.strptime('2024-04-06', "%Y-%m-%d") and game_date < datetime.strptime('2024-04-07', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2025-04-05', "%Y-%m-%d") and game_date < datetime.strptime('2025-04-06', "%Y-%m-%d")):
                 game_round = 5
-            elif(game_date > datetime.strptime('2024-04-08', "%Y-%m-%d") and game_date < datetime.strptime('2024-04-09', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2025-04-07', "%Y-%m-%d") and game_date < datetime.strptime('2025-04-09', "%Y-%m-%d")):
                 game_round = 6
 
             game_complete = 0
@@ -173,7 +173,6 @@ for x in range(0,1):
 
             #print("finished game: " + str(game_id))
 
-    '''
 
     '''-----------------------------------Update team scores '''
 

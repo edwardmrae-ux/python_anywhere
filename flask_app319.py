@@ -29,6 +29,7 @@ db = SQLAlchemy(app)
 @app.route("/ncaa", methods=["GET", "POST"])
 def index_ncaa():
 
+
     mydb = mysql.connector.connect(
         host="erae22.mysql.pythonanywhere-services.com",
         user="erae22",
@@ -99,13 +100,17 @@ def index_ncaa():
         alive = item[3]
         wins = item[4]
         exit_round = item[5]
-        points = item[6]
-        short_name = item[8]
+        next_match = item[6]
+        next_opp_id = item[7]
+        next_opp = item[8]
+        points = item[9]
+        short_name = item[11]
 
         team_alive_data[short_name] = alive
         team_seed_data[short_name] = seed
         team_win_data[short_name] = wins
         team_points_data[short_name] = points
+
 
     if request.method == "GET":
         return render_template("ncaa-pool_newAPI.html", scores=scores, team_alive_data=team_alive_data, team_seed_data=team_seed_data, team_win_data=team_win_data, team_points_data=team_points_data, current_round=current_round)

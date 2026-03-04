@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+        <style>
+            .ncaa-out {
+                text-decoration: line-through;
+                color: red;
+            }
+            .ncaa-win {
+                color: green;
+            }
+            .ncaa-details {
+                font-size: 13px;
+            }
+            .ncaa-key {
+                text-align: right;
+            }
+            .ncaa-red {
+                color: red;
+            }
+            .ncaa-green {
+                color: green;
+            }
+        </style>
+
+        <title>NCAA Pick 5 Pool</title>
+
+
+    </head>
+
+    <body>
+        <nav class="navbar navbar-inverse">
+          <div class="container">
+            <div class="navbar-header">
+             <!-- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>-->
+              <a class="navbar-brand" href="#">NCAA Pick 5 Pool</a>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container">
+            <div class="ncaa-key">
+            <p> <span class="ncaa-red">Red: Eliminated</span>   |   <span class="ncaa-green">Green: Advanced to next round</span></p>
+            </div>
+
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Team 1</th>
+                            <th scope="col">Team 2</th>
+                            <th scope="col">Team 3</th>
+                            <th scope="col">Team 4</th>
+                            <th scope="col">Team 5</th>
+                            <th scope="col">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in scores %}
+                        <tr>
+                            <td><b>{{ item[1] }}</b></td>
+                            <td {% if team_alive_data[item[3]] == 0 %} class="ncaa-out"{% endif %} {% if team_win_data[item[3]] == current_round %} class="ncaa-win"{% endif %}>({{team_seed_data[item[3]] }}) {{ item[3] }}<table class="table ncaa-details"><tr><td>Wins: {{ team_win_data[item[3]] }}</td><td>Points: {{ team_points_data[item[3]] }}</td></tr></table></td>
+                            <td {% if team_alive_data[item[5]] == 0 %} class="ncaa-out"{% endif %} {% if team_win_data[item[5]] == current_round %} class="ncaa-win"{% endif %}>({{team_seed_data[item[5]] }}) {{ item[5] }}<table class="table ncaa-details"><tr><td>Wins: {{ team_win_data[item[5]] }}</td><td>Points: {{ team_points_data[item[5]] }}</td></tr></table></td>
+                            <td {% if team_alive_data[item[7]] == 0 %} class="ncaa-out"{% endif %} {% if team_win_data[item[7]] == current_round %} class="ncaa-win"{% endif %}>({{team_seed_data[item[7]] }}) {{ item[7] }}<table class="table ncaa-details"><tr><td>Wins: {{ team_win_data[item[7]] }}</td><td>Points: {{ team_points_data[item[7]] }}</td></tr></table></td>
+                            <td {% if team_alive_data[item[9]] == 0 %} class="ncaa-out"{% endif %} {% if team_win_data[item[9]] == current_round %} class="ncaa-win"{% endif %}>({{team_seed_data[item[9]] }}) {{ item[9] }}<table class="table ncaa-details"><tr><td>Wins: {{ team_win_data[item[9]] }}</td><td>Points: {{ team_points_data[item[9]] }}</td></tr></table></td>
+                            <td {% if team_alive_data[item[11]] == 0 %} class="ncaa-out"{% endif %} {% if team_win_data[item[11]] == current_round %} class="ncaa-win"{% endif %}>({{team_seed_data[item[11]] }}) {{ item[11] }}<table class="table ncaa-details"><tr><td>Wins: {{ team_win_data[item[11]] }}</td><td>Points: {{ team_points_data[item[11]] }}</td></tr></table></td>
+                            <td>{{ item[17] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Round X</td>
+                            <td><table><tbody><tr><td></td><td>1H</td><td>2H</td><td>Total</td></tr><tr><td>Team 1</td><td>25</td><td>28</td><td>53</td></tr><tr><td>Team 1</td><td>25</td><td>28</td><td>53</td></tr></tbody></table></td>
+                            <td><table><thead><tr><th>Opponent</th></tr></thead><tbody><tr><td>Scores</td></tr></tbody></table></td>
+                            <td><table><thead><tr><th>Opponent</th></tr></thead><tbody><tr><td>Scores</td></tr></tbody></table></td>
+                            <td><table><thead><tr><th>Opponent</th></tr></thead><tbody><tr><td>Scores</td></tr></tbody></table></td>
+                            <td><table><thead><tr><th>Opponent</th></tr></thead><tbody><tr><td>Scores</td></tr></tbody></table></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+            <p></p>
+            <p></p>
+
+        </div>
+
+    </body>
+</html>

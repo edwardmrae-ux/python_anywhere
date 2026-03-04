@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+        <style>
+            .golf-dropped {
+                font-style: italic;
+                color: gray;
+            }
+            .ncaa-win {
+                color: green;
+            }
+            .golf-details {
+                font-size: 13px;
+            }
+            .ncaa-key {
+                text-align: right;
+            }
+            .ncaa-red {
+                color: red;
+            }
+            .ncaa-green {
+                color: green;
+            }
+        </style>
+
+        <title>Kensington</title>
+
+
+    </head>
+
+    <body>
+        <nav class="navbar navbar-inverse">
+          <div class="container">
+            <div class="navbar-header">
+             <!-- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>-->
+              <a class="navbar-brand" href="#">Kensington</a>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container">
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Meal</th>
+                            <th scope="col">Last Made</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                            {% for item in myresult_recipes %}
+                            <tr>
+                                <td>{{ item[1] }}</td>
+                                <td>{{ item[2] }}</td>
+                                <td>
+                                    <form action="{{ url_for('read_form')}}" method="post">
+                                        <!--<input type="checkbox" id="meal" name="{{ item[1] }}" value="{{ item[1] }}">-->
+                                        <input name="recipe" class="form-control" id="recipe1">
+                                        <input type="submit" value="Submit">
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                    </tbody>
+
+                </table>
+                <p></p>
+            <p></p>
+
+        </div>
+
+    </body>
+</html>

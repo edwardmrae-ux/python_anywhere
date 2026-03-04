@@ -1,0 +1,103 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+        <style>
+            .golf-dropped {
+                font-style: italic;
+                color: gray;
+            }
+            .ncaa-win {
+                color: green;
+            }
+            .golf-details {
+                font-size: 13px;
+            }
+            .ncaa-key {
+                text-align: right;
+            }
+            .ncaa-red {
+                color: red;
+            }
+            .ncaa-green {
+                color: green;
+            }
+        </style>
+
+        <title>Masters Pool</title>
+
+
+    </head>
+
+    <body>
+        <nav class="navbar navbar-inverse">
+          <div class="container">
+            <div class="navbar-header">
+             <!-- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>-->
+              <a class="navbar-brand" href="#">Masters Pool</a>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container">
+            <div class="ncaa-key">
+                <p>Current round: {{ tournament_round }}</p>
+                <p>Data updated: {{ tournament_updated.strftime('%I:%M %p %b-%d-%Y') }}</p>
+
+            </div>
+
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Player 1</th>
+                            <th scope="col">Player 2</th>
+                            <th scope="col">Player 3</th>
+                            <th scope="col">Player 4</th>
+                            <th scope="col">Side Piece</th>
+                            <th scope="col">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in picks_scores %}
+                        <tr>
+                            <td><b>{{ item[0] }}</b></td>
+                            <td>{{ player_name_data[item[1]] }}<table class="table golf-details"><tr><td>To Par: {{ player_score_data[item[1]] }}</td><td>Thru: {{ player_holes_played_data[item[1]] }}</td></tr><tr><td>Position: {{ player_position_data[item[1]] }}</td><td>Status: {{ player_status_data[item[1]] }}</td></tr></table></td>
+                            <td>{{ player_name_data[item[2]] }}<table class="table golf-details"><tr><td>To Par: {{ player_score_data[item[2]] }}</td><td>Thru: {{ player_holes_played_data[item[2]] }}</td></tr><tr><td>Position: {{ player_position_data[item[2]] }}</td><td>Status: {{ player_status_data[item[2]] }}</td></tr></table></td>
+                            <td>{{ player_name_data[item[3]] }}<table class="table golf-details"><tr><td>To Par: {{ player_score_data[item[3]] }}</td><td>Thru: {{ player_holes_played_data[item[3]] }}</td></tr><tr><td>Position: {{ player_position_data[item[3]] }}</td><td>Status: {{ player_status_data[item[3]] }}</td></tr></table></td>
+                            <td>{{ player_name_data[item[4]] }}<table class="table golf-details"><tr><td>To Par: {{ player_score_data[item[4]] }}</td><td>Thru: {{ player_holes_played_data[item[4]] }}</td></tr><tr><td>Position: {{ player_position_data[item[4]] }}</td><td>Status: {{ player_status_data[item[4]] }}</td></tr></table></td>
+                            <td>{{ player_name_data[item[5]] }}<table class="table golf-details"><tr><td>To Par: {{ player_score_data[item[5]] }}</td><td>Thru: {{ player_holes_played_data[item[5]] }}</td></tr><tr><td>Position: {{ player_position_data[item[5]] }}</td><td>Status: {{ player_status_data[item[5]] }}</td></tr></table></td>
+                            <td>{{ item[11] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+                <h3>Scoring:</h3>
+                        <p>All four primary picks count towards your score.</p>
+                        <p>The inverse of each players score in relation to par is added to your total.</p>
+                        <p>A bonus of 12 points is awarded to each player who makes the cut.</p>
+                        <p>A bonus is awarded to the top 5 finishers:</p>
+                        <p>5 points to first place.</p>
+                        <p>4 points to second place.</p>
+                        <p>3 points to third place.</p>
+                        <p>2 points to fourth place.</p>
+                        <p>1 point to fifth place.</p>
+
+            <p></p>
+            <p></p>
+
+        </div>
+
+    </body>
+</html>

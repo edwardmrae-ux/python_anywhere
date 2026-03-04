@@ -1,6 +1,7 @@
 import requests
-from datetime import datetime
-from datetime import timedelta
+#from datetime import datetime
+#from datetime import timedelta
+from datetime import datetime, timedelta
 import mysql.connector
 from time import strftime, localtime
 import time
@@ -9,6 +10,26 @@ print("--------Starting---------")
 
 for x in range(0,1):
     print("Starting loop: " + str(x))
+
+    #Getting current round
+    now = datetime.now()
+    now_EDT = now - timedelta(hours=4)
+
+    current_round = 0
+    if(now_EDT > datetime.strptime('2023-03-16', "%Y-%m-%d") and now_EDT < datetime.strptime('2023-03-18', "%Y-%m-%d")):
+        current_round = 1
+    elif(now_EDT > datetime.strptime('2023-03-18', "%Y-%m-%d") and now_EDT < datetime.strptime('2023-03-23', "%Y-%m-%d")):
+        current_round = 2
+    elif(now_EDT > datetime.strptime('2023-03-23', "%Y-%m-%d") and now_EDT < datetime.strptime('2023-03-25', "%Y-%m-%d")):
+        current_round = 3
+    elif(now_EDT > datetime.strptime('2023-03-25', "%Y-%m-%d") and now_EDT < datetime.strptime('2023-04-01', "%Y-%m-%d")):
+        current_round = 4
+    elif(now_EDT > datetime.strptime('2023-04-01', "%Y-%m-%d") and now_EDT < datetime.strptime('2023-04-03', "%Y-%m-%d")):
+        current_round = 5
+    elif(now_EDT > datetime.strptime('2023-04-03', "%Y-%m-%d") and now_EDT < datetime.strptime('2023-04-04', "%Y-%m-%d")):
+        current_round = 6
+
+
 
     SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
         username="erae22",
@@ -44,15 +65,12 @@ for x in range(0,1):
         if item[1] == 'Ended' or item[1] == 'AET':
             finished_games.append(item[0])
 
-    print("existing games: " + str(existing_games))
-    print("finished games: " + str(finished_games))
-
     #print("Finished games:")
     #print(finished_games)
 
 
     #Games API call
-    url = "https://basketapi1.p.rapidapi.com/api/basketball/matches/21/3/2024"
+    url = "https://basketapi1.p.rapidapi.com/api/basketball/matches/18/3/2023"
 
     headers = {
     	"X-RapidAPI-Key": "b88fd41b6amsh5775253c68a3727p1f2f1djsn80959b53b4a8",
@@ -61,9 +79,7 @@ for x in range(0,1):
 
     response = requests.request("GET", url, headers=headers)
 
-    print(response.text)
-
-    '''
+    #print(response.text)
 
     json_response = response.json()
 
@@ -80,7 +96,7 @@ for x in range(0,1):
     #Looping through games
     for game in games:
         tournament = game["tournament"]["name"]
-        if tournament == 'NCAA Division I, Championship':
+        if tournament == 'NCAA March Madness':
             game_id = game["id"]
             game_status = game["status"]["description"]
             epoch_start_time = game["startTimestamp"]
@@ -101,6 +117,15 @@ for x in range(0,1):
             else:
                 home_team_score = game["homeScore"]["current"]
                 away_team_score = game["awayScore"]["current"]
+                if game_status == 'Overtime':
+                    time_remaining = 300 - game["time"]["played"]
+                else:
+                    time_remaining = 1200 - game["time"]["played"]
+                #print(type(time_remaining))
+                time_remaining_str = str(timedelta(seconds=time_remaining))[2:]
+
+
+
 
             #game_id = str(id)+"_"+str(home_team_id)
             #print(str(id) + " - " + str(tournament))
@@ -118,17 +143,17 @@ for x in range(0,1):
             game_date = game_time_date - timedelta(hours=4)
 
             game_round = 0
-            if(game_date > datetime.strptime('2024-03-21', "%Y-%m-%d") and game_date < datetime.strptime('2024-03-23', "%Y-%m-%d")):
+            if(game_date > datetime.strptime('2023-03-16', "%Y-%m-%d") and game_date < datetime.strptime('2023-03-18', "%Y-%m-%d")):
                 game_round = 1
-            elif(game_date > datetime.strptime('2024-03-23', "%Y-%m-%d") and game_date < datetime.strptime('2024-03-25', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2023-03-18', "%Y-%m-%d") and game_date < datetime.strptime('2023-03-20', "%Y-%m-%d")):
                 game_round = 2
-            elif(game_date > datetime.strptime('2024-03-28', "%Y-%m-%d") and game_date < datetime.strptime('2024-03-30', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2023-03-23', "%Y-%m-%d") and game_date < datetime.strptime('2023-03-25', "%Y-%m-%d")):
                 game_round = 3
-            elif(game_date > datetime.strptime('2024-03-30', "%Y-%m-%d") and game_date < datetime.strptime('2024-04-01', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2023-03-25', "%Y-%m-%d") and game_date < datetime.strptime('2023-03-27', "%Y-%m-%d")):
                 game_round = 4
-            elif(game_date > datetime.strptime('2024-04-06', "%Y-%m-%d") and game_date < datetime.strptime('2024-04-07', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2023-04-01', "%Y-%m-%d") and game_date < datetime.strptime('2023-04-02', "%Y-%m-%d")):
                 game_round = 5
-            elif(game_date > datetime.strptime('2024-04-08', "%Y-%m-%d") and game_date < datetime.strptime('2024-04-09', "%Y-%m-%d")):
+            elif(game_date > datetime.strptime('2023-04-03', "%Y-%m-%d") and game_date < datetime.strptime('2023-04-04', "%Y-%m-%d")):
                 game_round = 6
 
             game_complete = 0
@@ -145,7 +170,7 @@ for x in range(0,1):
             mycursor_games = mydb.cursor()
 
             if game_id in existing_games and game_id != 156679:
-                mycursor_games.execute("UPDATE ncaa_games SET home_score = %s, away_score = %s, status = %s, winner = %s, last_updated = %s WHERE id = %s", (home_team_score, away_team_score, game_status, game_winner, now_EDT, game_id,  ))
+                mycursor_games.execute("UPDATE ncaa_games SET home_score = %s, away_score = %s, status = %s, winner = %s, last_updated = %s, time = %s WHERE id = %s", (home_team_score, away_team_score, game_status, game_winner, now_EDT, time_remaining_str, game_id,  ))
                 #print("updating: ", id)
                 #print(id)
 
@@ -167,13 +192,18 @@ for x in range(0,1):
 
                 #mydb.commit()
             elif id != 156679:
-                mycursor_games.execute("INSERT INTO ncaa_games (id, date, home, away, home_score, away_score, status, round, last_updated, home_name, away_name) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )", (game_id, game_date, home_team_id, away_team_id, home_team_score, away_team_score, game_status, game_round, now_EDT, home_team_name, away_team_name ))
+                mycursor_games.execute("INSERT INTO ncaa_games (id, date, home, away, home_score, away_score, status, round, last_updated, home_name, away_name, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )", (game_id, game_date, home_team_id, away_team_id, home_team_score, away_team_score, game_status, game_round, now_EDT, home_team_name, away_team_name, time_remaining_str ))
                 #print("inserting", id, game_date, home_team_id, away_team_id, home_score, away_score, game_status, game_round, home_team_name, away_team_name)
+            #mydb.commit()
+
+            if game_round == current_round:
+                mycursor_games.execute("UPDATE ncaa_teams SET current_round_game = %s WHERE id = %s", (game_id, home_team_id, ))
+                mycursor_games.execute("UPDATE ncaa_teams SET current_round_game = %s WHERE id = %s", (game_id, away_team_id, ))
             mydb.commit()
 
             #print("finished game: " + str(game_id))
 
-    '''
+
 
     '''-----------------------------------Update team scores '''
 
@@ -188,7 +218,6 @@ for x in range(0,1):
     mycursor_teams.execute("select id, seed, wins from ncaa_teams")
     myresult_teams = mycursor_teams.fetchall()
 
-    #print("myresult teams: " + str(myresult_teams))
 
     for item in myresult_teams:
         team_id = item[0]
@@ -196,8 +225,6 @@ for x in range(0,1):
         wins = item[2]
 
         points = seed * wins
-
-        #print("team id: " + str(team_id) + ". seed: " + str(seed) + ". wins: " + str(wins) + ". points: " + str(points) + ".")
 
         mycursor_update_teams = mydb.cursor()
         mycursor_update_teams.execute("update ncaa_teams set points = %s WHERE id = %s", (points, team_id, ))
@@ -234,7 +261,7 @@ for x in range(0,1):
     mycursor_picks.execute("select id, name, pick1_id, pick2_id, pick3_id, pick4_id, pick5_id from ncaa_picks")
     myresult_picks = mycursor_picks.fetchall()
 
-    #print(myresult_picks)
+    print(myresult_picks)
 
 
     for item in myresult_picks:
