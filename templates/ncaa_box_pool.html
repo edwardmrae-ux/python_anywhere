@@ -1,0 +1,75 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+        <title>NCAA March Madness Box Pool</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/ncaa-box-pool">NCAA March Madness Box Pool</a>
+                </div>
+                <p class="navbar-text navbar-right"><a href="/ncaa" class="navbar-link">Pick 5 Pool</a></p>
+            </div>
+        </nav>
+
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'info' }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <h2>Leaderboard</h2>
+            <p>Box = (row digit, column digit) = ones digit of home score, away score. Points increase by round. Current round: {{ current_round }}.</p>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Box</th>
+                        <th>Games Won</th>
+                        <th>Total Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in participants %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><b>{{ p[1] }}</b></td>
+                        <td>{{ p[2] }}–{{ p[3] }}</td>
+                        <td>{{ p[5] }}</td>
+                        <td>{{ p[4] }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5">No participants yet. Add some below.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <hr>
+            <h3>Add participant</h3>
+            <form method="post" class="form-inline">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required placeholder="Participant name">
+                </div>
+                <div class="form-group">
+                    <label for="row_digit">Row (0–9)</label>
+                    <input type="number" class="form-control" id="row_digit" name="row_digit" min="0" max="9" required>
+                </div>
+                <div class="form-group">
+                    <label for="col_digit">Col (0–9)</label>
+                    <input type="number" class="form-control" id="col_digit" name="col_digit" min="0" max="9" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
+    </body>
+</html>

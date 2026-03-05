@@ -1,40 +1,28 @@
-
 # A very simple Flask Hello World app for you to get started with...
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import mysql.connector
-from datetime import datetime
-from datetime import timedelta
 from operator import itemgetter
+
+import config
+from ncaa_rounds import get_current_round
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
+app.config["SECRET_KEY"] = "change-me-in-production"
 
-SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
-    username="erae22",
-    password="7623chz2g4",
-    hostname="erae22.mysql.pythonanywhere-services.com",
-    databasename="erae22$ncaa_tourney",
-)
-app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
+app.config["SQLALCHEMY_DATABASE_URI"] = config.get_sqlalchemy_uri()
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-'''Database connection'''
-
 
 @app.route("/ncaa", methods=["GET", "POST"])
 def index_ncaa():
-
-    mydb = mysql.connector.connect(
-        host="erae22.mysql.pythonanywhere-services.com",
-        user="erae22",
-        password="7623chz2g4",
-        database="erae22$ncaa_tourney"
-    )
+    params = config.get_mysql_connection_params()
+    mydb = mysql.connector.connect(**params)
 
     mycursor_player_leaderboard = mydb.cursor()
     mycursor_player_leaderboard.execute("select p.id,p.name,p.pick1_id,p.pick1_name,p.pick2_id,p.pick2_name,p.pick3_id,p.pick3_name,p.pick4_id,p.pick4_name,p.pick5_id,p.pick5_name,p.pick1_pts,p.pick2_pts,p.pick3_pts,p.pick4_pts,p.pick5_pts,p.total_pts from ncaa_picks p")
@@ -46,22 +34,7 @@ def index_ncaa():
 
     mydb.close()
 
-    now = datetime.now()
-    now_EDT = now - timedelta(hours=4)
-
-    current_round = 0
-    if(now_EDT > datetime.strptime('2025-03-20', "%Y-%m-%d") and now_EDT < datetime.strptime('2025-03-22', "%Y-%m-%d")):
-        current_round = 1
-    elif(now_EDT > datetime.strptime('2025-03-21', "%Y-%m-%d") and now_EDT < datetime.strptime('2025-03-24', "%Y-%m-%d")):
-        current_round = 2
-    elif(now_EDT > datetime.strptime('2025-03-27', "%Y-%m-%d") and now_EDT < datetime.strptime('2025-03-29', "%Y-%m-%d")):
-        current_round = 3
-    elif(now_EDT > datetime.strptime('2025-03-29', "%Y-%m-%d") and now_EDT < datetime.strptime('2025-03-31', "%Y-%m-%d")):
-        current_round = 4
-    elif(now_EDT > datetime.strptime('2025-04-05', "%Y-%m-%d") and now_EDT < datetime.strptime('2025-04-07', "%Y-%m-%d")):
-        current_round = 5
-    elif(now_EDT > datetime.strptime('2025-04-07', "%Y-%m-%d") and now_EDT < datetime.strptime('2025-04-09', "%Y-%m-%d")):
-        current_round = 6
+    current_round = get_current_round()
 
     scores = []
     for item in myresult_player_leaderboard:
@@ -188,6 +161,52 @@ def index_golf():
 
     if request.method == "GET":
         return render_template("golf_pool.html", picks_scores=picks_scores, player_name_data=player_name_data, player_score_data=player_score_data, player_position_data=player_position_data, player_status_data=player_status_data, player_holes_played_data=player_holes_played_data, tournament_round=tournament_round, tournament_updated=tournament_updated)
+
+
+@app.route("/ncaa-box-pool", methods=["GET", "POST"])
+def ncaa_box_pool():
+    """NCAA March Madness box pool: leaderboard and admin form to add participants."""
+    params = config.get_mysql_connection_params()
+    mydb = mysql.connector.connect(**params)
+
+    if request.method == "POST":
+        name = (request.form.get("name") or "").strip()
+        row_digit = request.form.get("row_digit")
+        col_digit = request.form.get("col_digit")
+        try:
+            row_digit = int(row_digit) if row_digit is not None else None
+            col_digit = int(col_digit) if col_digit is not None else None
+        except (TypeError, ValueError):
+            row_digit = col_digit = None
+        if name and row_digit is not None and col_digit is not None and 0 <= row_digit <= 9 and 0 <= col_digit <= 9:
+            cur = mydb.cursor()
+            try:
+                cur.execute(
+                    "INSERT INTO box_pool_participants (name, row_digit, col_digit, total_points, games_won) VALUES (%s, %s, %s, 0, 0)",
+                    (name, row_digit, col_digit)
+                )
+                mydb.commit()
+                flash(f"Added {name} with box ({row_digit}, {col_digit}).")
+            except mysql.connector.IntegrityError:
+                mydb.rollback()
+                flash(f"Box ({row_digit}, {col_digit}) is already taken.", "error")
+            cur.close()
+        else:
+            flash("Invalid input: name required, row and col must be 0–9.", "error")
+
+    cur = mydb.cursor()
+    cur.execute(
+        "SELECT id, name, row_digit, col_digit, total_points, games_won FROM box_pool_participants ORDER BY total_points DESC, games_won DESC"
+    )
+    participants = cur.fetchall()
+    mydb.close()
+
+    current_round = get_current_round()
+    return render_template(
+        "ncaa_box_pool.html",
+        participants=participants,
+        current_round=current_round,
+    )
 
 
 @app.route('/test', methods=['GET'])

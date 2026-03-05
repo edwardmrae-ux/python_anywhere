@@ -3,28 +3,20 @@ from datetime import datetime
 from datetime import timedelta
 import mysql.connector
 from time import strftime, localtime
-import time
+
+import config
+from ncaa_rounds import get_round_from_date
 
 print("--------Starting---------")
 
-SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
-    username="erae22",
-    password="7623chz2g4",
-    hostname="erae22.mysql.pythonanywhere-services.com",
-    databasename="erae22$ncaa_tourney",
-)
-
-'''Database connection'''
-
-mydb = mysql.connector.connect(
-  host="erae22.mysql.pythonanywhere-services.com",
-  user="erae22",
-  password="7623chz2g4",
-  database="erae22$ncaa_tourney"
-)
+params = config.get_mysql_connection_params()
+mydb = mysql.connector.connect(**params)
 
 now = datetime.now()
 now_EDT = now - timedelta(hours=4)
+current_day = now.day
+current_month = now.month
+current_year = now.year
 
 #returning games already in table and finished games
 
@@ -45,14 +37,9 @@ for item in myresult_existing_games:
 #print(finished_games)
 
 
-#Games API call
-url = "https://basketapi1.p.rapidapi.com/api/basketball/matches/20/3/2025"
-
-headers = {
-	"X-RapidAPI-Key": "b88fd41b6amsh5775253c68a3727p1f2f1djsn80959b53b4a8",
-	"X-RapidAPI-Host": "basketapi1.p.rapidapi.com"
-}
-
+# Games API call (RapidAPI)
+url = f"{config.RAPIDAPI_BASE_URL}/api/basketball/matches/{current_day}/{current_month}/{current_year}"
+headers = config.get_rapidapi_headers()
 response = requests.request("GET", url, headers=headers)
 
 #print(response.text)
@@ -108,20 +95,7 @@ for game in games:
         game_time_date = datetime.strptime(game_start, date_format_str)
 
         game_date = game_time_date - timedelta(hours=4)
-
-        game_round = 0
-        if(game_date > datetime.strptime('2025-03-20', "%Y-%m-%d") and game_date < datetime.strptime('2025-03-22', "%Y-%m-%d")):
-            game_round = 1
-        elif(game_date > datetime.strptime('2025-03-22', "%Y-%m-%d") and game_date < datetime.strptime('2025-03-24', "%Y-%m-%d")):
-            game_round = 2
-        elif(game_date > datetime.strptime('2025-03-27', "%Y-%m-%d") and game_date < datetime.strptime('2025-03-29', "%Y-%m-%d")):
-            game_round = 3
-        elif(game_date > datetime.strptime('2025-03-29', "%Y-%m-%d") and game_date < datetime.strptime('2025-03-31', "%Y-%m-%d")):
-            game_round = 4
-        elif(game_date > datetime.strptime('2025-04-05', "%Y-%m-%d") and game_date < datetime.strptime('2025-04-06', "%Y-%m-%d")):
-            game_round = 5
-        elif(game_date > datetime.strptime('2025-04-07', "%Y-%m-%d") and game_date < datetime.strptime('2025-04-08', "%Y-%m-%d")):
-            game_round = 6
+        game_round = get_round_from_date(game_date)
 
         game_complete = 0
 
@@ -158,7 +132,7 @@ for game in games:
                     mycursor_games.execute("UPDATE ncaa_teams SET alive = 0, wins = %s, exit_round = %s WHERE id = %s", (num_wins, game_round, away_team_id, ))
 
             #mydb.commit()
-        elif id != 156679:
+        elif game_id != 156679:
             mycursor_games.execute("INSERT INTO ncaa_games (id, date, home, away, home_score, away_score, status, round, last_updated, home_name, away_name) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )", (game_id, game_date, home_team_id, away_team_id, home_team_score, away_team_score, game_status, game_round, now_EDT, home_team_name, away_team_name ))
             #print("inserting", id, game_date, home_team_id, away_team_id, home_score, away_score, game_status, game_round, home_team_name, away_team_name)
         mydb.commit()
@@ -254,13 +228,15 @@ for item in myresult_picks:
 
 
 print("finished updating leaderboard section")
+
+# Box pool: award points for finished games (ones-digit box pool)
+try:
+    import ncaa_box_pool_scores
+    ncaa_box_pool_scores.run()
+    print("box pool scores updated")
+except Exception as e:
+    print("box pool scores error:", e)
+
 print("finished everything")
-
-#print('Sleeping for 5 seconds')
-#time.sleep(5)
-
-
-
-
 mydb.close()
 
