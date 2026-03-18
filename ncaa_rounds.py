@@ -7,12 +7,12 @@ from datetime import timedelta
 
 # Points awarded per game by round (1 = First Four/R64, 6 = Championship)
 POINTS_PER_ROUND = {
-    1: 100,
-    2: 200,
-    3: 450,
-    4: 750,
-    5: 1000,
-    6: 3000,
+    1: 0,
+    2: 125,
+    3: 200,
+    4: 400,
+    5: 650,
+    6: 2500,
 }
 
 # Round name for display

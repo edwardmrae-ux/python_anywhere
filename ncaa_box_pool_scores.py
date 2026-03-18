@@ -30,6 +30,17 @@ def run():
         if game_id in scored_game_ids:
             continue
 
+        # Exclude Round 1 games from any box-pool participant stats.
+        # We still mark them as "scored" to avoid reprocessing on later runs.
+        if game_round == 1:
+            cur_ins = mydb.cursor()
+            cur_ins.execute(
+                "INSERT IGNORE INTO box_pool_scored_games (game_id) VALUES (%s)",
+                (game_id,),
+            )
+            mydb.commit()
+            continue
+
         home_ones = int(home_score) % 10
         away_ones = int(away_score) % 10
         points = get_points_for_round(game_round)
