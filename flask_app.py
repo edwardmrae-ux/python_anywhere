@@ -171,32 +171,42 @@ def ncaa_box_pool():
 
     if request.method == "POST":
         name = (request.form.get("name") or "").strip()
+        participant_id_raw = request.form.get("participant_id")
         row_digit = request.form.get("row_digit")
         col_digit = request.form.get("col_digit")
         try:
+            participant_id = int(participant_id_raw) if participant_id_raw is not None else None
             row_digit = int(row_digit) if row_digit is not None else None
             col_digit = int(col_digit) if col_digit is not None else None
         except (TypeError, ValueError):
-            row_digit = col_digit = None
-        if name and row_digit is not None and col_digit is not None and 0 <= row_digit <= 9 and 0 <= col_digit <= 9:
+            participant_id = row_digit = col_digit = None
+        if (
+            name
+            and participant_id is not None
+            and row_digit is not None
+            and col_digit is not None
+            and 0 <= row_digit <= 9
+            and 0 <= col_digit <= 9
+        ):
             cur = mydb.cursor()
             try:
                 cur.execute(
-                    "INSERT INTO box_pool_participants (name, row_digit, col_digit, total_points, games_won) VALUES (%s, %s, %s, 0, 0)",
-                    (name, row_digit, col_digit)
+                    "INSERT INTO box_pool_participants (participant_id, name, row_digit, col_digit, total_points, games_won) VALUES (%s, %s, %s, %s, 0, 0)",
+                    (participant_id, name, row_digit, col_digit),
                 )
                 mydb.commit()
-                flash(f"Added {name} with box ({row_digit}, {col_digit}).")
+                flash(f"Added {name} (participant {participant_id}) with box ({row_digit}, {col_digit}).")
             except mysql.connector.IntegrityError:
                 mydb.rollback()
                 flash(f"Box ({row_digit}, {col_digit}) is already taken.", "error")
             cur.close()
         else:
-            flash("Invalid input: name required, row and col must be 0–9.", "error")
+            flash("Invalid input: name and participant id required, row and col must be 0–9.", "error")
 
     cur = mydb.cursor()
     cur.execute(
-        "SELECT id, name, row_digit, col_digit, total_points, games_won FROM box_pool_participants ORDER BY total_points DESC, games_won DESC"
+        "SELECT participant_id, MAX(name) AS name, SUM(games_won) AS games_won, SUM(total_points) AS total_points "
+        "FROM box_pool_participants GROUP BY participant_id ORDER BY total_points DESC, games_won DESC"
     )
     participants = cur.fetchall()
     mydb.close()
